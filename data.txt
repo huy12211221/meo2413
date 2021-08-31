@@ -1,0 +1,8 @@
+  
+   
+111111111,Phan Thanh Hung,Nu,80,95 
+000000000,Phan Thanh Huy,Nam,20,10
+222222222,Nguyen Huy Hung,Nam,50,11                              
+  
+300000000,Nguyen Minh Huy,Nam,75,90
+                                   
