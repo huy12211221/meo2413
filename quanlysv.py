@@ -1,20 +1,34 @@
 
 from sys import excepthook, implementation
 
-# def question(func,text):
-#      while True:
-#         func
-#         que=input(text)
-#         if que == "Y":
-#             continue
-#         elif que == "N":
-#             break
+def enter_score(text):
+    while True:
+        score = input(text)
+        try:
+            if 0<=int(score)<=100:
+                break
+        except:
+            continue
+    return score
+
+def check_file():
+    file_object= open('data.txt',mode='r+')
+    data = file_object.read()
+    if data == "":
+        print("Không có dữ liệu nào!")
+        file_object.close()
+        exit()
+    file_object.close()
 
 def enter_mhv(text):
     while True:
         x=input(text)  
         if len(x)==9:
-            break
+            try:
+                b=int(x)
+                break
+            except ValueError:
+                continue
         else:
             continue
     return x
@@ -41,9 +55,10 @@ def add_hv():
     mhv = f[2]
     name=input("Nhập tên học viên: ")
     gioi_tinh=enter_gioi_tinh()
-    score_theoly=input("Nhập điểm thi lý thuyết: ")
-    score_practice=input("Nhập điểm thi thực hành: ")
-    file_object.write("\n"+mhv+","+name+","+gioi_tinh+","+score_theoly+","+score_practice)
+    country = input("Nhập quê quán: ")
+    score_theoly=enter_score("Nhập điểm thi lý thuyết: ")
+    score_practice=enter_score("Nhập điểm thi thực hành: ")
+    file_object.write("\n"+mhv+","+name+","+gioi_tinh+","+country+","+score_theoly+","+score_practice)
     file_object.close()
     print("Bạn đã thêm thành công!!")
 
@@ -67,6 +82,7 @@ def exists(num,text):
         else:
             print("Mã học viên đã tồn tại!")
             num=0
+    file_object.close()
     return num,c,mhv #num là vị trí con trỏ chuột, c là str thông tin học viên
 
 def not_exists(num,text):
@@ -91,6 +107,7 @@ def not_exists(num,text):
             print("Mã học viên không tồn tại!")
             num=0
     m = c.split(",") # list thông tin của học viên
+    file_object.close()
     return num,c,m #num là vị trí con trỏ chuột, c là str thông tin học viên
         
 def delete_hv(num,c):
@@ -103,17 +120,28 @@ def check_score(text):
     file_object = open('data.txt',mode='r+')
     data = file_object.read()
     list_data = data.split("\n")
+    v=0
     for i in range (0,len(list_data)):
         c = list_data[i]
-        if c[0]==" ":
+        try:
+            if c[0]==" ":
+                continue
+        except IndexError:
             continue
         d = c.split(",")
         if text == "up":
-            if ((int(d[3])+int(d[4]))/2) >= 75:
+            if ((int(d[4])+int(d[5]))/2) >= 75:
+                v=+1
                 print(d[0],d[1])  
+            if v==0:
+                print("Không có học viên nào!")
         elif text == "down":
-            if ((int(d[3])+int(d[4]))/2) < 75:
+            if ((int(d[4])+int(d[5]))/2) < 75:
+                v+=1
                 print(d[0],d[1]) 
+            if v==0:
+                print("Không có học viên nào!")
+                
 def update2_hv(num,c,z,m):
     l=""
     n=0
@@ -129,12 +157,15 @@ def update2_hv(num,c,z,m):
         gioi_tinh = enter_gioi_tinh()
         m[2]=gioi_tinh
     elif z == "3":
-        score_theoly = input("Nhập điểm thi lý thuyết: ")
-        m[3]=score_theoly
+        country= input("Nhập quê quán: ")
+        m[3]= country
     elif z == "4":
-        score_practice = input("Nhập điểm thi thực hành: ")
-        m[3]=score_practice
-    file_object= open('data.txt',mode='r+')
+        score_theoly = enter_score("Nhập điểm thi lý thuyết: ")
+        m[4]=score_theoly
+    elif z == "5":
+        score_practice = enter_score("Nhập điểm thi thực hành: ")
+        m[5]=score_practice
+    file_object = open('data.txt',mode='r+')
     file_object.seek(num)
     for i in range (0,len(m)):
         l+=m[i]
@@ -153,7 +184,7 @@ print("""Chọn chế độ:
 mode = input("Chọn: ")
 
 if mode == "1":
-    text = """Bạn có muốn thêm nữa không?(Nhập Y để tiếp tục, nhập "N" thoát)
+    text = """Bạn có muốn thêm nữa không?(Nhập Y để tiếp tục, nhập N thoát)
         -->"""
     while True:
         add_hv()
@@ -163,7 +194,8 @@ if mode == "1":
         elif que == "N":
             break
 elif mode == "2":
-    text = """Bạn có muốn xóa thêm không?(Nhập Y để tiếp tục, nhập "N" để thoát)
+    check_file()
+    text = """Bạn có muốn xóa thêm không?(Nhập Y để tiếp tục, nhập N để thoát)
             -->"""
     x = not_exists(0,"Nhập mã học viên cần xóa thông tin(gồm 9 số): ")
     while True:
@@ -175,17 +207,22 @@ elif mode == "2":
         elif que == "N":
             break
 elif mode == "3":
+    check_file()
     file_object= open('data.txt',mode='r+')
     data = file_object.read()
     list_data = data.split("\n")
     for i in range (0,len(list_data)):
         c = list_data[i]
-        if c[0]==" ":
+        try:
+            if c[0]==" ":
+                continue
+        except IndexError:
             continue
         d = c.split(",")
         print(d[0],d[1])
     file_object.close()
 elif mode == "4":
+    check_file()
     while True:
         x = not_exists(0,"Nhập mã học viên cần cập nhật(gồm 9 số): ")
         while True:
@@ -193,8 +230,9 @@ elif mode == "4":
             (0)Mã học viên
             (1)Họ và tên
             (2)Giới tính
-            (3)Điểm thi lý thuyết
-            (4)Điểm thi thục hành
+            (3)Quê quán
+            (4)Điểm thi lý thuyết
+            (5)Điểm thi thục hành
             Chọn: """)
             update2_hv(x[0],x[1],z,x[2])
             que = input("""Bạn muốn cập nhật thông tin khác không?
@@ -212,6 +250,8 @@ elif mode == "4":
         elif que == "N":
             break
 elif mode == "5":
+    check_file()
     check_score("up")
 elif mode == "6":
+    check_file()
     check_score("down")
